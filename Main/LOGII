@@ -1,0 +1,164 @@
+
+ Title (Processed): 
+Optimal Transmit Antenna Selection Rule for Interference-Outage Constrained Underlay Cr and Impact
+	of Imperfect Csi
+
+ Number of words in the processed title: 15
+==================================================
+ Abstract Related Comments 
+==================================================
+ No abstract found.
+==================================================
+ Keywords Related Comments 
+==================================================
+Cognitive radio, underlay, antenna selection, interference-outage constraint, symbol error probability.
+
+
+ Number of keywords: 5
+--- Warnings ---
+Line 0614 [Warning] : IEEE Style Violation: Keywords are not in alphabetical order.
+==================================================
+ Acronyms in Main Text 
+==================================================
++-----------+---------------+------------------------------------------------+
+| Acronym   |   Occurrences | Full Form                                      |
++===========+===============+================================================+
+| CR        |             7 | Cognitive radio                                |
++-----------+---------------+------------------------------------------------+
+| IEEE      |             1 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| PU        |             7 | primary user                                   |
++-----------+---------------+------------------------------------------------+
+| SU        |            18 | secondary user                                 |
++-----------+---------------+------------------------------------------------+
+| PR        |            55 | primary receiver                               |
++-----------+---------------+------------------------------------------------+
+| SINR      |             5 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| TAS       |            78 | Transmit antenna selection                     |
++-----------+---------------+------------------------------------------------+
+| RF        |             3 | radio frequency                                |
++-----------+---------------+------------------------------------------------+
+| SEP       |            54 | symbol error probability                       |
++-----------+---------------+------------------------------------------------+
+| SR        |            40 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| ST        |            85 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| PT        |             7 | primary transmitter                            |
++-----------+---------------+------------------------------------------------+
+| CSI       |            30 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| UDP       |             1 | user datagram protocol                         |
++-----------+---------------+------------------------------------------------+
+| CDF       |             2 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| RV        |            12 | random variable                                |
++-----------+---------------+------------------------------------------------+
+| PDF       |             7 | probability density function                   |
++-----------+---------------+------------------------------------------------+
+| CCDF      |            12 | complementary cumulative distribution function |
++-----------+---------------+------------------------------------------------+
+| QPS       |             1 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| PSK       |             4 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| QAM       |             3 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| MRC       |             1 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| DBPSK     |             1 | differential binary phase shift keying         |
++-----------+---------------+------------------------------------------------+
+| NCBFSK    |             1 | non coherent binary frequency shift keying     |
++-----------+---------------+------------------------------------------------+
+| DPSK      |             1 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| MFSK      |             1 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| MMSE      |             2 | minimum mean square error                      |
++-----------+---------------+------------------------------------------------+
+| EMI       |             5 | enhanced minimum interference                  |
++-----------+---------------+------------------------------------------------+
+| DS        |             5 | difference selection                           |
++-----------+---------------+------------------------------------------------+
+| EMSLIR    |             5 | Not Defined                                    |
++-----------+---------------+------------------------------------------------+
+| SUs       |             1 | secondary user                                 |
++-----------+---------------+------------------------------------------------+
+| RVs       |             6 | random variable                                |
++-----------+---------------+------------------------------------------------+
+| SEPs      |             1 | symbol error probability                       |
++-----------+---------------+------------------------------------------------+
+| CCDFs     |             3 | complementary cumulative distribution function |
++-----------+---------------+------------------------------------------------+
+| PU's      |             3 | primary user                                   |
++-----------+---------------+------------------------------------------------+
+==================================================
+ Acronym Warnings 
+==================================================
+Line 0624 [Warning]: Acronym 'IEEE' is not properly expanded and not enclosed in parentheses at the first occurrence.
+Line 0624 [Warning]: Acronym 'PR' is not enclosed in parentheses at first occurrence.
+Line 0627 [Warning]: Acronym 'SINR' is not properly expanded at first occurrence.
+Line 0631 [Warning]: Acronym 'SR' is not properly expanded and not enclosed in parentheses at the first occurrence.
+Line 0634 [Warning]: Acronym 'ST' is not properly expanded and not enclosed in parentheses at the first occurrence.
+Line 0639 [Warning]: Acronym 'PT' is not enclosed in parentheses at first occurrence.
+Line 0641 [Warning]: Acronym 'CSI' is not properly expanded at first occurrence.
+Line 0656 [Warning]: Acronym 'CDF' is not properly expanded and not enclosed in parentheses at the first occurrence.
+Line 0723 [Warning]: Acronym 'QPS' is not properly expanded and not enclosed in parentheses at the first occurrence.
+Line 0723 [Warning]: Acronym 'PSK' is not properly expanded and not enclosed in parentheses at the first occurrence.
+Line 0723 [Warning]: Acronym 'QAM' is not properly expanded and not enclosed in parentheses at the first occurrence.
+Line 0723 [Warning]: Acronym 'MRC' is not properly expanded and not enclosed in parentheses at the first occurrence.
+Line 0723 [Warning]: Acronym 'DPSK' is not properly expanded at first occurrence.
+Line 0723 [Warning]: Acronym 'MFSK' is not properly expanded at first occurrence.
+Line 1113 [Warning]: Acronym 'EMSLIR' is not properly expanded at first occurrence.
+Line 0624 [Warning]: Full form 'Cognitive radio' (for acronym 'CR') is expanded 2 times at lines: 624.
+Line 0631 [Warning]: Full form 'symbol error probability' (for acronym 'SEP') is expanded 3 times at lines: 631, 636.
+Line 0679 [Warning]: Full form 'random variable' (for acronym 'RV') is expanded 2 times at lines: 679, 873.
+Line 0631 [Warning]: Acronym 'SEP' is enclosed in parentheses 2 times at lines: 631, 636.
+
+==================================================
+	Scientist Names Related Comments
+==================================================
+
+Scientist Names Used = Gauss, Gaussian
+==================================================
+	Index Related Comments
+==================================================
+At Line 614 : Index terms are not in alphabetical order
+
+
+===============================================================
+                Equation related comments
+===============================================================
+Warning: Punctuation not found at the end of the equation whose line no is 1314
+Warning: punction (',') is missing at the end of an equation whose line no is: 744
+
+===============================================================
+                Math operator related comments
+===============================================================
+
+
+==================================================
+Line 902: No Parenthesis warning.
+Line 915: No Parenthesis warning.
+Line 916: No Parenthesis warning.
+Line 973: No Parenthesis warning.
+Line 975: No Parenthesis warning.
+Line 998: No Parenthesis warning.
+Line 1000: No Parenthesis warning.
+Line 1020: No Parenthesis warning.
+Line 1057: No Parenthesis warning.
+Line 1067: No Parenthesis warning.
+Line 1071: No Parenthesis warning.
+Line 1072: No Parenthesis warning.
+Line 1351: No Parenthesis warning.
+Line 702: Long Exponential expression warning.
+Line 704: Long Exponential expression warning.
+Line 985: Long Exponential expression warning.
+Line 1060: Long Exponential expression warning.
+Line 1385: Long Exponential expression warning.
+Line 890: No required space at expression and condition.
+Line 892: No required space at expression and condition.
+Line 951: No required space at expression and condition.
+
+
