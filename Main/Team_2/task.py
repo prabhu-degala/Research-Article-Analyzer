@@ -1,22 +1,23 @@
-#1.Count the number of words in the title and abstract.
-#2. Create a list of acronyms used.
-#3. Count the number of times each acronym occurred.
-#4. Identify the acronyms that are not expanded at the first occurrence .
+# 1.Count the number of words in the title and abstract.
+# 2. Create a list of acronyms used.
+# 3. Count the number of times each acronym occurred.
+# 4. Identify the acronyms that are not expanded at the first occurrence .
 
-#Instructions: pip install tabulate
-'''Pending tasks 
-    
+# Instructions: pip install tabulate
+'''Pending tasks
+
     NOTE : If the acronym is not repeated the whole body then no need to add parentheses.
 
-1) Output in form of Name of acr -Acro -Occurrence 
-     # This includes plural and singular both 
+1) Output in form of Name of acr -Acro -Occurrence
+     # This includes plural and singular both
 
-Comments Type 
+Comments Type
 2) If apostrophe is present ,then " Check whether this is for possessive form or mistaken by user for plural "
-    # eliminate the confusion between the actual symbol of ’ and the mistaken symbol  ' 
+    # eliminate the confusion between the actual symbol of ’ and the mistaken symbol  '
  '''
-import re   
+import re
 from tabulate import tabulate
+
 acronyms_dict = {
     "AF": "Audio frequency",
     "AFC": "Automatic frequency control",
@@ -168,10 +169,10 @@ acronyms_dict = {
 
 
 class team_2:
-    def __init__(self, latex_content, begin_document_index):        
+    def __init__(self, latex_content, begin_document_index):
 
         self.latex_content = latex_content
-        
+
         title_index = latex_content.find(r'\title{')
         begin_document_index = latex_content.find(r'\begin{document}')
 
@@ -185,19 +186,26 @@ class team_2:
 
         self.begin_document_index = begin_index
 
-        self.text=""
-        self.work=""
-        self.error=[]
-        self.line_number=0
-        self.keyword_line=0
-        self.main_start_line_number=0
+        self.text = ""
+        self.work = ""
+        self.error = []
+        self.line_number = 0
+        self.keyword_line = 0
+        self.main_start_line_number = 0
         self.acronyms = []
-        self.acro_count={}
-        self.acro_full={}
+        self.acro_count = {}
+        self.acro_full = {}
         self.warnings = []
+        self.warnings1 = []
+        self.warnings2 = []
+        self.warnings3 = []
         self.abstract_acro_data = {}
         self.maintext_acro_data = {}
         self.issued_warnings = set()
+        self.warnings_abstract = []
+        self.warnings_maintext = []
+        self.acronym_line_map = {}
+        self.acronym_first_flags = {}
 
     def extract_title(self, title_command=r'\title', opening_brace='{', closing_brace='}'):
         # Find the index of the title command using the given begin_document_index
@@ -227,7 +235,7 @@ class team_2:
             current_index += 1
 
         return None
-    
+
     def extract_abstract(self):
         # Find the index of \begin{abstract} using the given begin_document_index
         begin_abstract_index = self.latex_content.find(r'\begin{abstract}', self.begin_document_index)
@@ -238,36 +246,35 @@ class team_2:
         # Extract the abstract content without \begin{abstract} and \end{abstract}
         if begin_abstract_index != -1 and end_abstract_index != -1:
             abstract_content = self.latex_content[begin_abstract_index + len(r'\begin{abstract}'):end_abstract_index]
-           
+
             # Count the number of newlines before the abstract_start_index to get the line number
             self.line_number = self.latex_content.count('\n', 0, begin_abstract_index) + 1
-            
+
             return abstract_content
         else:
             return None
-       
-       
+
     def extract_keywords(self):
-        # Find the index of \begin{abstract} using the given begin_document_index
+        # Find the index of \begin{IEEEkeywords} using the given begin_document_index
         begin_keywords_index = self.latex_content.find(r'\begin{IEEEkeywords}', self.begin_document_index)
-        
-        # Find the index of \end{abstract}
+
+        # Find the index of \end{IEEEkeywords}
         end_keywords_index = self.latex_content.find(r'\end{IEEEkeywords}', begin_keywords_index)
 
-        # Extract the abstract content without \begin{abstract} and \end{abstract}
+        # Extract the abstract content without \begin{IEEEkeywords} and \end{IEEEkeywords}
         if begin_keywords_index != -1 and end_keywords_index != -1:
-            keywords_content = self.latex_content[begin_keywords_index + len(r'\begin{IEEEkeywords}'):end_keywords_index]
-            
-             # Count the number of newlines before the abstract_start_index to get the line number
+            keywords_content = self.latex_content[
+                               begin_keywords_index + len(r'\begin{IEEEkeywords}'):end_keywords_index]
+
+            # Count the number of newlines before the begin_keywords_index to get the line number
             self.keyword_line = self.latex_content.count('\n', 0, begin_keywords_index) + 1
-                
+
             return keywords_content
         else:
             return None
-        
-       
-    def remove_latex_commands(self,text):
-        
+
+    def remove_latex_commands(self, text):
+
         # Function to remove LaTeX commands
         text_withoutcommands = re.sub(r'\\[a-zA-Z]+', '', text.strip())
         # Define a regular expression pattern to match the unwanted patterns
@@ -277,21 +284,22 @@ class team_2:
         cleaned_text = re.sub(pattern, '', text_withoutcommands)
         # Split the cleaned text into words
         words = cleaned_text.split()
-        
+
         if words:
             # Get the first word
             first_word = words[0]
-            
+
             # Find the index of the first occurrence of the first word in the original text
             end_index = text.find(first_word)
-            
+
             # Count the number of newline characters before the first word
             count_newlines = text[:end_index].count('\n')
-            
+
             # Update the line number
             self.line_number += count_newlines
-        
+
         return cleaned_text
+
     def extract_main_text(self):
         doc_start = self.latex_content.find(r'\begin{document}')
         if doc_start == -1:
@@ -362,8 +370,9 @@ class team_2:
                 cleaned_lines.append(cleaned)
 
         return '\n'.join(cleaned_lines)
-    def remove_latex_commands1(self,text):
-        
+
+    def remove_latex_commands1(self, text):
+
         # Function to remove LaTeX commands
         text_withoutcommands = re.sub(r'\\[a-zA-Z]+', '', text.strip())
         # Define a regular expression pattern to match the unwanted patterns
@@ -373,22 +382,23 @@ class team_2:
         cleaned_text = re.sub(pattern, '', text_withoutcommands)
         # Split the cleaned text into words
         words = cleaned_text.split()
-        
+
         if words:
             # Get the first word
             first_word = words[0]
-            
+
             # Find the index of the first occurrence of the first word in the original text
             end_index = text.find(first_word)
-            
+
             # Count the number of newline characters before the first word
             count_newlines = text[:end_index].count('\n')
-            
+
             # Update the line number
             self.keyword_line += count_newlines
-            #print(self.keyword_line)
-        
+            # print(self.keyword_line)
+
         return cleaned_text
+
     def remove_latex_commands2(self, text):
 
         # Remove LaTeX math environments
@@ -406,19 +416,15 @@ class team_2:
 
         return text.strip()
 
-
-    
-    
-
     def count_words(self, text):
         # Split the text into words and return the count
         words = text.split()
         return len(words)
-   
+
     def extract_acronyms(self):
         # Extract acronyms with all capital letters (e.g., TASD)
         capital_acronyms = re.findall(r'(?!\bX\b)[A-Z]{2,}', self.text)
-        
+
         # Extract acronyms ending with 's' (e.g., LEDs)
         s_suffix_acronyms = re.findall(r"\b[A-Z]{2,}s\b", self.text)
 
@@ -429,20 +435,20 @@ class team_2:
         self.acronyms = capital_acronyms + s_suffix_acronyms + apostrophe_acronyms
 
     def count_acronyms_occurrences(self):
-        
+
         for word in self.acronyms:
             if word in self.acro_count:
                 self.acro_count[word] += 1
             else:
                 self.acro_count[word] = 1
 
-    def check_enclosed_in_parentheses(self,acronym):
-        # Check if the acronym is properly enclosed within parentheses 
+    def check_enclosed_in_parentheses(self, acronym):
+        # Check if the acronym is properly enclosed within parentheses
         pattern = re.compile(rf'\({re.escape(acronym)}\)')
         return bool(pattern.search(self.work))
 
-    def acro_defined(self,acronym):
-        
+    def acro_defined(self, acronym):
+
         num_uppercase = sum(1 for char in acronym if char.isupper())
 
         # Find the first occurrence of the acronym
@@ -452,7 +458,7 @@ class team_2:
 
         # Extract a limited window of text before the acronym
         context_window = self.work[max(0, position - 300):position]
-        
+
         # Get the last 'num_uppercase' words before the acronym
         words_before = re.findall(r'\b\w+\b', context_window)[-num_uppercase:]
 
@@ -467,8 +473,7 @@ class team_2:
             return True
         else:
             return False
-        
-        
+
     def normalize_acronym(self, acronym):
         """Normalize acronyms by removing possessive or plural suffixes."""
         if acronym.endswith("'s"):
@@ -477,11 +482,10 @@ class team_2:
             return acronym[:-1]
         return acronym
 
-    
     def verify_acronyms(self):
         self.full_form_counts = {}
         self.parentheses_counts = {}
-        self.acronym_line_map = {}
+
         self.acronym_first_flags = {}
 
         abstract = self.remove_latex_commands(self.extract_abstract())
@@ -491,18 +495,18 @@ class team_2:
             self.work = self.text
             normalized = self.normalize_acronym(acronym)
 
-            # Step 1: Map acronym line numbers
-            if acronym in abstract:
-                self.acronym_line_map[acronym] = self.line_number
-            elif acronym in keywords:
-                self.acronym_line_map[acronym] = self.keyword_line
-            else:
-                for line_number, line in self.main_text_with_lines:
-                    if acronym in line:
-                        self.acronym_line_map[acronym] = line_number
-                        break
+            if acronym not in self.acronym_line_map:
+                if acronym in abstract:
+                    self.acronym_line_map[acronym] = self.line_number
+                elif acronym in keywords:
+                    self.acronym_line_map[acronym] = self.keyword_line
                 else:
-                    self.acronym_line_map[acronym] = -1
+                    for line_number, line in self.main_text_with_lines:
+                        if acronym in line:
+                            self.acronym_line_map[acronym] = line_number
+                            break
+                    else:
+                        self.acronym_line_map[acronym] = -1
 
             # Step 2: Check full form and parentheses
             self.work = self.text
@@ -524,112 +528,175 @@ class team_2:
 
             # Step 3: Issue warnings (but only if not already issued)
             key_base = (acronym,)
-        
+
             if key_base in self.issued_warnings:
                 continue
 
             if expanded and not enclosed:
                 key = (acronym, "expanded_no_parens")
                 if key not in self.issued_warnings:
-                    self.warnings.append(
-                        f"\nLine {line_number:04d} [Warning]: Acronym '{acronym}' is expanded but not enclosed in parentheses at first occurrence."
+                    self.warnings1.append(
+                        f"\nLine {line_number:04d} : [Warning] Acronym '{acronym}' is expanded but not enclosed in parentheses at first occurrence."
                     )
                     self.issued_warnings.add(key)
 
             elif not expanded and enclosed:
                 key = (acronym, "enclosed_no_expand")
                 if key not in self.issued_warnings:
-                    self.warnings.append(
-                        f"\nLine {line_number:04d} [Warning]: Acronym '{acronym}' is enclosed in parentheses but not properly expanded at first occurrence."
+                    self.warnings1.append(
+                        f"\nLine {line_number:04d} : [Warning] Acronym '{acronym}' is enclosed in parentheses but not properly expanded at first occurrence."
                     )
                     self.issued_warnings.add(key)
 
             elif not expanded and not enclosed:
                 key = (acronym, "no_expand_no_enclose")
                 if key not in self.issued_warnings:
-                    self.warnings.append(
-                        f"\nLine {line_number:04d} [Warning]: Acronym '{acronym}' is not properly expanded and not enclosed in parentheses at the first occurrence."
+                    self.warnings1.append(
+                        f"\nLine {line_number:04d} : [Warning] Acronym '{acronym}' is not properly expanded and not enclosed in parentheses at the first occurrence."
                     )
                     self.issued_warnings.add(key)
 
-    def check_repeated_full_forms_from_acronyms(self):
-        issued_full_form_warnings = set()
-        full_text = (
-            self.remove_latex_commands(self.extract_abstract()) + "\n" +
-            self.remove_latex_commands1(self.extract_keywords()) + "\n" +
-            "\n".join([line for _, line in self.main_text_with_lines])
-        ).lower()
+    def verify_acronyms_in_main_text(self):
+        self.full_form_counts = {}
+        self.parentheses_counts = {}
+
+        actual_acronyms = set(self.acro_count)  
+
+        for acronym in self.acro_count:
+            normalized = self.normalize_acronym(acronym)
+
+            # Choose preferred version to show in warning
+            if normalized != acronym and normalized in actual_acronyms:
+                warning_acronym = normalized
+            else:
+                warning_acronym = acronym
+
+            for line_number, line in self.main_text_with_lines:
+                if acronym in line or normalized in line:
+                    self.work = line
+                    enclosed = self.check_enclosed_in_parentheses(normalized)
+                    expanded = self.acro_defined(normalized)
+
+                    if (normalized,) in self.issued_warnings:
+                        break  
+
+                    if expanded:
+                        self.acro_full[acronym] = self.acro_full.get(normalized)
+
+                    self.acronym_line_map[acronym] = line_number
+                    self.acronym_first_flags[acronym] = {
+                        "full_form": expanded,
+                        "enclosed": enclosed,
+                        "line": line_number
+                    }
+
+                    if expanded and not enclosed:
+                        self.warnings1.append(
+                            f"\nLine {line_number:04d} : [Warning] Acronym '{warning_acronym}' is expanded but not enclosed in parentheses at first occurrence."
+                        )
+                    elif not expanded and enclosed:
+                        self.warnings1.append(
+                            f"\nLine {line_number:04d} : [Warning] Acronym '{warning_acronym}' is enclosed in parentheses but not properly expanded at first occurrence."
+                        )
+                    elif not expanded and not enclosed:
+                        self.warnings1.append(
+                            f"\nLine {line_number:04d} : [Warning] Acronym '{warning_acronym}' is not properly expanded and not enclosed in parentheses at the first occurrence."
+                        )
+
+                    self.issued_warnings.add((normalized,))
+                    break  
+
+    def get_all_numbered_lines(self):
+        # Split abstract and assign line numbers
+        abstract_lines = self.extract_abstract().splitlines()
+        abstract_with_numbers = list(enumerate(abstract_lines, start=self.line_number))
+
+        # Split keywords and assign line numbers
+        keyword_lines = self.extract_keywords().splitlines()
+        keyword_with_numbers = list(enumerate(keyword_lines, start=self.keyword_line))
+
+        # Main text already has (line_number, line)
+        main_text_with_numbers = self.main_text_with_lines
+
+        return abstract_with_numbers + keyword_with_numbers + main_text_with_numbers
+
+    def check_repeated_full_forms_from_acronyms(self, section="abstract"):
+        issued = set()
+        all_lines = self.get_all_numbered_lines()
+
+        if section == "abstract":
+            # Include both abstract and keyword ranges
+            abstract_end = self.line_number + len(self.extract_abstract().splitlines())
+            keyword_end = self.keyword_line + len(self.extract_keywords().splitlines())
+
+            section_lines = [
+                (lnum, line) for lnum, line in all_lines
+                if self.line_number <= lnum < keyword_end
+            ]
+            warning_list = self.warnings_abstract
+        else:
+            section_lines = self.main_text_with_lines
+            warning_list = self.warnings_maintext
+
+        full_text = "\n".join(line for _, line in section_lines).lower()
 
         for acronym, full_form in self.acro_full.items():
             if not full_form:
                 continue
 
-            normalized_full_form = ' '.join(full_form.lower().split())
-            count = full_text.count(normalized_full_form)
+            norm_acro = self.normalize_acronym(acronym)
+            norm_form = ' '.join(full_form.lower().split())
+            key = (norm_acro, norm_form)
 
-            if count > 1:
-                line_numbers = [
-                    f"{line_number:04d}"
-                    for line_number, line in self.main_text_with_lines
-                    if normalized_full_form in line.lower()
-                ]
-
-                lines_str = ", ".join(line_numbers) if line_numbers else "?"
-                first_line = line_numbers[0] if line_numbers else "????"
-
-                key = (acronym, normalized_full_form)
-                if key not in issued_full_form_warnings:
-                    self.warnings.append(
-                        f"\nLine {first_line} [Warning]: Full form '{full_form}' (for acronym '{acronym}') is expanded {count} times at lines: {lines_str}."
-                    )
-                    issued_full_form_warnings.add(key)
-
-                    
-    def check_multiple_parentheses(self):
-        checked = set()
-
-        # Make a list to store all (line_number, line) from abstract + keywords + main text
-        full_text_lines = []
-
-        # Add abstract lines with their line numbers
-        abstract_lines = self.extract_abstract().splitlines()
-        for i, line in enumerate(abstract_lines, start=self.line_number):
-            full_text_lines.append((i, line))
-
-        # Add keyword lines with their line numbers
-        keyword_lines = self.extract_keywords().splitlines()
-        for i, line in enumerate(keyword_lines, start=self.keyword_line):
-            full_text_lines.append((i, line))
-
-        # Add main text lines
-        full_text_lines.extend(self.main_text_with_lines)
-
-        # Now check each acronym
-        for acronym in set(self.acronyms):
-            if acronym in checked:
+            if key in issued:
                 continue
 
-            pattern = rf'\({re.escape(acronym)}\)'
-            count = len(re.findall(pattern, self.text))
+            count = full_text.count(norm_form)
+            if count > 1:
+                line_numbers = [
+                    f"{lnum:04d}" for lnum, line in section_lines if norm_form in line.lower()
+                ]
+                if line_numbers:
+                    warning_list.append(
+                        f"\nLine {line_numbers[0]} : [Warning] Full form '{full_form}' (for acronym '{acronym}') is expanded {count} times at lines {', '.join(line_numbers)}."
+                    )
+                    issued.add(key)
+
+    def check_multiple_parentheses(self, section="abstract"):
+        checked = set()
+        all_lines = self.get_all_numbered_lines()
+
+        if section == "abstract":
+            abstract_end = self.line_number + len(self.extract_abstract().splitlines())
+            keyword_end = self.keyword_line + len(self.extract_keywords().splitlines())
+
+            section_lines = [
+                (lnum, line) for lnum, line in all_lines
+                if self.line_number <= lnum < keyword_end
+            ]
+            warning_list = self.warnings_abstract
+        else:
+            section_lines = self.main_text_with_lines
+            warning_list = self.warnings_maintext
+
+        for acronym in self.acronyms:
+            norm_acro = self.normalize_acronym(acronym)
+            if norm_acro in checked:
+                continue
+
+            pattern = rf'\({re.escape(norm_acro)}\)'
+            line_numbers = [
+                f"{lnum:04d}" for lnum, line in section_lines if re.search(pattern, line)
+            ]
+            count = len(line_numbers)
 
             if count > 1:
-                # Now collect all lines where acronym is found in parentheses
-                line_numbers = [
-                    f"{line_number:04d}"
-                    for line_number, line in full_text_lines
-                    if re.search(pattern, line)
-                ]
-                lines_str = ", ".join(line_numbers) if line_numbers else "?"
-                first_line = line_numbers[0] if line_numbers else "????"
-
-                self.warnings.append(
-                    f"\nLine {first_line} [Warning]: Acronym '{acronym}' is enclosed in parentheses {count} times at lines: {lines_str}."
+                warning_list.append(
+                    f"\nLine {line_numbers[0]} : [Warning] Acronym '{acronym}' is enclosed in parentheses {count} times at lines {', '.join(line_numbers)}."
                 )
+            checked.add(norm_acro)
 
-            checked.add(acronym)
-
-
-
+            checked.add(norm_acro)
 
     def run(self):
         abstract = self.remove_latex_commands(self.extract_abstract())
@@ -637,12 +704,12 @@ class team_2:
         keywords = self.remove_latex_commands1(self.extract_keywords())
         main_text_raw = self.extract_main_text()
         main_text = self.remove_latex_commands2(main_text_raw)
-        
-        output = []  # The output would be updated with the extracted title and abstract along with the word counts respectively.
-       
-        if title:          
-            
-            # Process the title by removing LaTeX commands           
+
+        output = [] 
+
+        if title:
+
+            # Process the title by removing LaTeX commands
             output.append(f"\n Title (Processed): \n{title}")
 
             # Count words in the processed title
@@ -651,21 +718,20 @@ class team_2:
 
         else:
             output.append(f"\n No title found.")
-        
-        output.append('\n'+'='*50+"\n Abstract Related Comments \n"+'='*50)
-        
+
+        output.append('\n' + '=' * 50 + "\n Abstract Related Comments \n" + '=' * 50)
+
         if abstract:
 
             # Process the abstract by removing LaTeX commands
 
-
             # Count words in the processed abstract
             word_count = self.count_words(abstract)
             output.append(f"\n\n Number of words in the abstract: {word_count}")
-        
+
         else:
             output.append("\n No abstract found.")
-                
+
         output.append('\n' + '=' * 50 + "\n Keywords Related Comments \n" + '=' * 50)
 
         # Extract and clean keywords
@@ -675,17 +741,20 @@ class team_2:
 
         # Check if keywords are in alphabetical order
         if keyword_list != sorted(keyword_list, key=str.lower):
-            self.warnings.append(f"\nLine {self.keyword_line:04d} [Warning] : IEEE Style Violation: Keywords are not in alphabetical order.")
+            self.warnings.append(
+                f"\nLine {self.keyword_line:04d} : [Warning] IEEE Style Violation: Keywords are not in alphabetical order.")
 
         # Check if last keyword ends with a full stop
         if keyword_list:
             last_keyword = keyword_list[-1].strip()
             if not last_keyword.endswith('.'):
-                self.warnings.append(f"\nLine {self.keyword_line:04d} [Warning] : IEEE Style Violation: Last keyword '{last_keyword}' should end with a full stop.")
+                self.warnings.append(
+                    f"\nLine {self.keyword_line:04d} : [Warning] IEEE Style Violation: Last keyword '{last_keyword}' should end with a full stop.")
 
             # Check if first keyword starts with a capital letter
             if not keyword_list[0][0].isupper():
-                self.warnings.append(f"\nLine {self.keyword_line:04d} [Warning] : IEEE Style Violation: The first keyword should begin with a capital letter.")
+                self.warnings.append(
+                    f"\nLine {self.keyword_line:04d} : [Warning] IEEE Style Violation: The first keyword should begin with a capital letter.")
 
             # Check remaining keywords for lowercase
             for i, keyword in enumerate(keyword_list[1:], start=2):  # start=2 for second keyword
@@ -701,9 +770,9 @@ class team_2:
                     else:
                         # Capitalized non-acronym word found → generate warning
                         self.warnings.append(
-                            f"\nLine {self.keyword_line:04d} [Warning] : IEEE Style Violation: In Keyword {i} ('{keyword}'), the word '{word}' should be entirely lowercase.Only the first keyword is capitalized."
+                            f"\nLine {self.keyword_line:04d} : [Warning] IEEE Style Violation: In Keyword {i} ('{keyword}'), the word '{word}' should be entirely lowercase.Only the first keyword is capitalized."
                         )
-                        break  # Only one warning per keyword
+                        break
 
         if keywords:
 
@@ -713,13 +782,13 @@ class team_2:
             # Count words in the processed abstract
             word_count = self.count_words(keywords)
             output.append(f"\n\n Number of keywords: {len(keyword_list)}")
-            
-        
+
+
         else:
             output.append("\n No keywords found.")
-            
+
         keyword_style_warnings = []
-         # Collect keyword style warnings
+        # Collect keyword style warnings
         for warning in self.warnings:
             if "keyword" in warning.lower():
                 keyword_style_warnings.append(warning)
@@ -727,118 +796,86 @@ class team_2:
             output.append("\n--- Warnings ---")
             output.extend(keyword_style_warnings)
         else:
-            output.append("\nNo keyword style issues found.")   
-       
-                       
-        
-        
-        self.text = f"{abstract} {keywords}"
+            output.append("\nNo keyword style issues found.")
 
+        self.text = ""
+        self.text = f"{abstract} {keywords}"
         self.acro_count.clear()
         self.acro_full.clear()
         self.acronyms.clear()
+        self.abstract_acro_data = {}
 
         self.extract_acronyms()
-    
-
         if self.acronyms:
             self.count_acronyms_occurrences()
             self.verify_acronyms()
-            #self.check_repeated_full_forms_from_acronyms()
+            self.check_repeated_full_forms_from_acronyms(section="abstract")
+            self.check_multiple_parentheses(section="abstract")
 
-            # Store abstract+keywords data
-         # Step 4: Build abstract acronym data
+            # Store abstract+keywords acronym data
             for acronym, count in self.acro_count.items():
                 normalized = self.normalize_acronym(acronym)
-                
-                # Prefer exact acronym full form if available, else fallback to normalized
-                full_form = self.acro_full.get(acronym)
-                if not full_form:
-                    full_form = self.acro_full.get(normalized)
-
+                full_form = self.acro_full.get(acronym) or self.acro_full.get(normalized)
                 self.abstract_acro_data[acronym] = {
                     "Occurrences": count,
                     "Full Form": full_form if full_form else "Not Defined"
                 }
 
-        # Step 5: Print table only once
+        # Print Abstract+Keywords Acronym Table
         if self.abstract_acro_data:
-            data = [[acronym, details["Occurrences"], details["Full Form"]] for acronym, details in self.abstract_acro_data.items()]
+            data = [[a, d["Occurrences"], d["Full Form"]] for a, d in self.abstract_acro_data.items()]
             table = tabulate(data, headers=["Acronym", "Occurrences", "Full Form"], tablefmt="grid")
-            output.append("\n" + "=" * 50 + "\n  Acronyms in the Abstract \n" + "=" * 50)
+            output.append("\n" + "=" * 50 + "\n  Acronyms in Abstract & Keywords \n" + "=" * 50)
             output.append(f"\n{table}")
+            output.append("\n --------Warnings----------- ")
+            output.extend(self.warnings_abstract)
+            for w in self.warnings1:
+                output.append(w)
+
         else:
             output.append("\n No acronyms found in abstract and keywords.")
-            
+
+        # === MAIN TEXT SECTION ===
+        self.warnings1.clear()
+        self.acronym_line_map.clear()
+        self.acronym_first_flags.clear()
+
         self.text = ""
         self.text = main_text
-
         self.acro_count.clear()
         self.acro_full.clear()
         self.acronyms.clear()
-        self.maintext_acro_data = {} 
+        self.acronym_line_map.clear()
+        self.issued_warnings.clear()
+        self.maintext_acro_data = {}
 
         self.extract_acronyms()
-    
-
-
         if self.acronyms:
             self.count_acronyms_occurrences()
-            self.verify_acronyms()
-            self.check_repeated_full_forms_from_acronyms()
-            
+            self.verify_acronyms_in_main_text()
+            self.check_repeated_full_forms_from_acronyms(section="main")
+            self.check_multiple_parentheses(section="main")
 
             # Store main text acronym data
-           
-        for acronym, count in self.acro_count.items():
+            for acronym, count in self.acro_count.items():
                 normalized = self.normalize_acronym(acronym)
-                
-                # Prefer exact match first
-                full_form = self.acro_full.get(acronym)
-                if not full_form:
-                    full_form = self.acro_full.get(normalized)
-
+                full_form = self.acro_full.get(acronym) or self.acro_full.get(normalized)
                 self.maintext_acro_data[acronym] = {
                     "Occurrences": count,
                     "Full Form": full_form if full_form else "Not Defined"
                 }
 
-        # Step 6: Generate table only once
+        # Print Main Text Acronym Table
         if self.maintext_acro_data:
-            main_data = [[acro, info["Occurrences"], info["Full Form"]] for acro, info in self.maintext_acro_data.items()]
-            main_table = tabulate(main_data, headers=["Acronym", "Occurrences", "Full Form"], tablefmt="grid")
+            data = [[a, d["Occurrences"], d["Full Form"]] for a, d in self.maintext_acro_data.items()]
+            table = tabulate(data, headers=["Acronym", "Occurrences", "Full Form"], tablefmt="grid")
             output.append('\n' + '=' * 50 + "\n Acronyms in Main Text \n" + '=' * 50)
-            output.append(f"\n{main_table}")
+            output.append(f"\n{table}")
+            output.append("\n --------Warnings----------- ")
+            output.extend(self.warnings_maintext)
+            for w in self.warnings1:
+                output.append(w)
+
         else:
-            output.append("\n No acronyms found in the main text.")
-        self.text=""
-        self.text = f"{abstract} {keywords} {main_text}"
-        self.check_multiple_parentheses()
-
-        # Categorize warnings
-       # keyword_style_warnings = []
-        acronym_warnings = []
-
-        for warning in self.warnings:
-            if "Keyword" in warning or "keyword" in warning:
-                pass
-            else:
-                acronym_warnings.append(warning)
-
-        # === Keywords Section ===
-        #output.append('\n' + '=' * 50 + "\n Keywords Related Comments \n" + '=' * 50)
-
-        #if keyword_style_warnings:
-            #output.append("\n--- Keyword Style Warnings ---")
-            #output.extend(keyword_style_warnings)
-        #else:
-            #output.append("\nNo keyword style issues found.")
-
-        # === All Acronym Warnings Section ===
-        if acronym_warnings:
-            output.append('\n' + '=' * 50 + "\n Acronym Warnings \n" + '=' * 50)
-            output.extend(acronym_warnings)
-        else:
-            output.append("\nNo acronym issues found in the given text.")
-
+            output.append("\n No acronyms found in main text.")
         return output
