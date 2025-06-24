@@ -70,7 +70,7 @@ class wrapper:
                     begin_index = bbl_text.find(r'\begin{document}')
 
         # Calling all team run() files
-        team_classes = [team_1, team_2, team_3, team_5, team_6, team_7, team_8]
+        team_classes = [team_1, team_2, team_3, team_4, team_5, team_6, team_7, team_8]
         for team_class in team_classes:
             try:
                 obj_team = team_class(text, begin_index)
